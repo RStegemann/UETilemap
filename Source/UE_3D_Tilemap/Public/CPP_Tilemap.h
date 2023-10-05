@@ -15,23 +15,29 @@ class UE_3D_TILEMAP_API ACPP_Tilemap : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACPP_Tilemap();
+	ACPP_Tilemap(ETileType Type, int MaxWidth, int MaxHeight, float TileSize);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-private:
+	
 	TArray<ACPP_Tile*> MapTiles;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Width;
+	int Width;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Height;
+	int Height;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float TileSize;
+	double TileSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double Spacing;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ETileType> TileType;
+	FAttachmentTransformRules* AttachmentRules;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable)
 	virtual void AddTile(int XIndex, int YIndex, ACPP_Tile* Tile);
 	virtual ACPP_Tile* GetTile(int XIndex, int YIndex);
 	virtual void RemoveTile(int XIndex, int YIndex);
