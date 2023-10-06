@@ -5,24 +5,24 @@
 
 ACPP_Tilemap::ACPP_Tilemap()
 {
-	this->TileType = Hex;
 	this->Width = 100;
 	this->Height = 100;
-	this->TileSize = 100;
+	this->TileWidth = 100;
+	this->TileHeight = 100;
 	MapTiles.Init(nullptr, Width * Height);
 	AttachmentRules = new FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
 }
 
 // Sets default values
-ACPP_Tilemap::ACPP_Tilemap(ETileType Type, int MaxWidth, int MaxHeight, float TileSize)
+ACPP_Tilemap::ACPP_Tilemap(int MaxWidth, int MaxHeight, float TileWidth,  float TileHeight)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	MapTiles.Init(nullptr, Width * Height);
-	this->TileType = Type;
 	this->Width = MaxWidth;
 	this->Height = MaxHeight;
-	this->TileSize = TileSize;
+	this->TileWidth = TileWidth;
+	this->TileHeight = TileHeight;
 	AttachmentRules = new FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
 }
 
@@ -33,13 +33,20 @@ void ACPP_Tilemap::BeginPlay()
 	
 }
 
+void ACPP_Tilemap::PlaceTileInGrid(int XIndex, int YIndex, float HeightOffset, ACPP_Tile* Tile)
+{
+	FVector CurrentLocation = Tile->GetActorLocation();
+	CurrentLocation += FVector(XIndex * (TileWidth + Spacing), YIndex * (TileHeight + Spacing), HeightOffset);
+	Tile -> SetActorLocation(CurrentLocation);
+}
+
 // Called every frame
 void ACPP_Tilemap::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-void ACPP_Tilemap::AddTile(int XIndex, int YIndex, ACPP_Tile* Tile)
+void ACPP_Tilemap::AddTile(int XIndex, int YIndex, float HeightOffset, ACPP_Tile* Tile)
 {
 	ACPP_Tile* CurrentTile = MapTiles[XIndex + YIndex * Width];
 	if(CurrentTile != nullptr)
@@ -47,10 +54,7 @@ void ACPP_Tilemap::AddTile(int XIndex, int YIndex, ACPP_Tile* Tile)
 		CurrentTile -> Destroy();
 	}
 	Tile -> AttachToActor(this, *AttachmentRules);
-	FVector CurrentLocation = Tile -> GetActorLocation();
-	CurrentLocation.X += XIndex * (TileSize + Spacing);
-	CurrentLocation.Y += YIndex * (TileSize + Spacing);
-	Tile -> SetActorLocation(CurrentLocation);
+	PlaceTileInGrid(XIndex, YIndex, HeightOffset, Tile);
 	MapTiles[XIndex + YIndex * Width] = Tile;
 }
 
